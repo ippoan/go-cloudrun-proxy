@@ -1,0 +1,29 @@
+name: Tag Release
+
+# workflow_dispatch で semver tag (`v{major}.{minor}.{patch}`) を採番 + push し、
+# 同 job 内で GitHub Release も作成する (Mode B = TAG_RELEASE_PAT 不要)。
+# go module の consumer (release-wave-gcp / secrets-inventory-gcp) は発行された
+# tag を go.mod の semver 参照に使う。Refs #4
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version bump type'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+        default: patch
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    uses: ippoan/ci-workflows/.github/workflows/tag-release.yml@main
+    with:
+      bump: ${{ inputs.bump }}
+      create_release: true
+    secrets: inherit
