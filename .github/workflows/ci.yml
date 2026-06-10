@@ -23,3 +23,19 @@ jobs:
       test_args: './... -race'
       # library のみ (main package なし) なので default の `-o /tmp/server` を外す
       build_args: './...'
+
+  # CI 完走後に squash auto-merge を queue する (go-ci.yml は auto-merge を
+  # 内蔵しないため caller で組む、ci-workflows CLAUDE.md 参照)。merge gate は
+  # branch protection の required checks (ci / vet, ci / test, ci / build) が
+  # 握る。deploy 系 job は本 repo に無いので needs は ci のみで足りる
+  # (auto-merge.yml 内蔵の deploy gate 静的検査も対象 job 0 で pass する)。
+  auto-merge:
+    if: github.event_name == 'pull_request'
+    needs: [ci]
+    uses: ippoan/ci-workflows/.github/workflows/auto-merge.yml@main
+    # auto-merge.yml は GitHub App credential (CI_APP_ID / CI_APP_PRIVATE_KEY、
+    # org secrets) を必須とするため secrets: inherit が必要。
+    secrets: inherit
+    permissions:
+      contents: write
+      pull-requests: write
