@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+# go-ci.yml は内部に `disable-auto-merge` job (`pull-requests: write` 要求) を
+# 持つ。nested の secret-verify job は本 repo では使わないが、reusable parse
+# 時の caller permissions check のため `id-token: write` の declare は必須
+# (ci-workflows CLAUDE.md「startup_failure」参照)。
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write
+
+jobs:
+  ci:
+    uses: ippoan/ci-workflows/.github/workflows/go-ci.yml@main
+    with:
+      test_args: './... -race'
+      # library のみ (main package なし) なので default の `-o /tmp/server` を外す
+      build_args: './...'

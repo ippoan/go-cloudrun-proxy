@@ -1,0 +1,8 @@
+# go-ci.yml の coverage 100% gate (auto-detect)。
+# 全 file を登録、exclude_funcs なし — MustEnv の fail 経路は fatalf を
+# package variable にしてテスト可能にしてある (env_test.go 参照)。
+[env.go]
+[auth.go]
+[json.go]
+[grpc_status.go]
+[health.go]
